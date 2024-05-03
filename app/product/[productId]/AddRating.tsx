@@ -54,6 +54,19 @@ const AddRating: React.FC<AddRatingProps> = ({ product, user }) => {
       setIsLoading(false);
       return toast.error("No rating selected");
     }
+
+    // Kiểm tra xem đã giao hàng hay chưa
+    const deliveredOrder = user?.orders.some(
+      (order) =>
+        order.products.find((item) => item.id === product.id) &&
+        order.deliveryStatus === "delivered"
+    );
+
+    if (!deliveredOrder) {
+      setIsLoading(false);
+      return toast.error("You can only rate the product after delivery");
+    }
+
     const ratingData = { ...data, userId: user?.id, product: product };
 
     try {
