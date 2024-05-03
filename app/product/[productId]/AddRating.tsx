@@ -56,20 +56,28 @@ const AddRating: React.FC<AddRatingProps> = ({ product, user }) => {
     }
     const ratingData = { ...data, userId: user?.id, product: product };
 
-    axios
-      .post("/api/rating", ratingData)
-      .then(() => {
-        toast.success("Đã gửi đánh giá");
-        router.refresh();
-        reset();
-      })
-      .catch((error) => {
-        console.log(error);
-        toast.error("Something went wrong");
-      })
-      .finally(() => {
-        setIsLoading(false);
+    try {
+      const response = await fetch("/api/rating", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(ratingData),
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit rating");
+      }
+
+      toast.success("Đã gửi đánh giá");
+      router.refresh();
+      reset();
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!user || !product) return null;
